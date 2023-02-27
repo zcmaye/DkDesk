@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/images/account.png</file>
+        <file>assets/images/account-chk.png</file>
+        <file>assets/images/device.png</file>
+        <file>assets/images/device-chk.png</file>
+        <file>assets/images/remote.png</file>
+        <file>assets/images/remote-chk.png</file>
+        <file>assets/images/copy.png</file>
+        <file>assets/images/copy-hover.png</file>
+        <file>assets/images/eye-off.png</file>
+        <file>assets/images/eye-off-hover.png</file>
+        <file>assets/images/eye-on.png</file>
+        <file>assets/images/modify.png</file>
+        <file>assets/images/modify-hover.png</file>
+        <file>assets/images/eye-on-hover.png</file>
+        <file>assets/images/close.png</file>
+        <file>assets/images/close-hover.png</file>
+        <file>assets/images/min.png</file>
+        <file>assets/images/more.png</file>
+    </qresource>
+</RCC>

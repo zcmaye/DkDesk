@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mainWindow</class>
+ <widget class="QWidget" name="mainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>810</width>
+    <height>558</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>810</width>
+    <height>558</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>810</width>
+    <height>558</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/*左边菜单栏*/
+QWidget#leftMenuWidget
+{
+	background-color: rgb(245,245,245);
+}
+
+QWidget#leftMenuWidget QPushButton
+{
+	border:none;
+	font-size:11pt;
+}
+
+QWidget#leftMenuWidget QPushButton:hover
+{
+	background-color: rgb(255, 255, 255);
+	border-radius:10px;
+}
+
+QWidget#leftMenuWidget QPushButton:checked
+{
+	background-color: rgb(255, 255, 255);
+	border-radius:10px;
+	color:#FF8D6B;
+}
+
+QLabel#titleLab
+{
+	color: #6A6A6A;
+	font-size:10pt;
+}
+
+/*远程协助页*/
+QWidget#rightWidget,QWidget#remotePage
+{
+	background-color: rgb(255, 255, 255);
+}
+QWidget#rightWidget QLineEdit,QPushButton
+{
+	border:none;
+	border-radius:8px;
+}
+
+QWidget#rightWidget QLabel#allowLab,QLabel#controlDeviceLab
+{
+	font-size:14pt;
+	color:black;
+}
+
+QWidget#rightWidget QLabel#localUDIDLab,QLabel#authCodeLab
+{
+	font-size:10pt;
+	color:#999999;
+}
+
+QWidget#rightWidget QLineEdit#localUDIDEdit,QLineEdit#authCodeEdit
+{
+	font-size:18pt;
+
+}
+
+/*--细节优化*/
+QWidget#rightWidget QLineEdit#buddyUDIDEdit
+{
+	border:1px solid #CCCCCC;
+	font-size:13pt;
+}
+
+QWidget#rightWidget QLineEdit#buddyUDIDEdit:hover
+{
+	border-color:#FF8D6B;
+}
+
+QWidget#rightWidget QPushButton#buddyConnectBtn
+{
+	color:white;
+	font-size:11pt;
+}
+QWidget#rightWidget QPushButton#buddyConnectBtn[enabled=&quot;false&quot;]
+{
+	background-color:#FFC6B5;
+}
+
+QWidget#rightWidget QPushButton#buddyConnectBtn[enabled=&quot;true&quot;]
+{
+	background-color:#FF8D6B;
+}
+
+QWidget#rightWidget QPushButton#buddyConnectBtn[enabled=&quot;true&quot;]:hover
+{
+	background-color:#FF6C37;
+}
+/*小按钮*/
+QWidget#rightWidget QPushButton#localUDIDCoppyBtn,QPushButton#authCodeSeeBtn,QPushButton#authCodeModifyBtn
+{
+	min-width:16px;
+	min-height:16px;
+	max-width:16px;
+	max-height:16px;
+}
+QWidget#rightWidget QPushButton#localUDIDCopyBtn
+{
+	image: url(:/assets/images/copy.png);
+}
+QWidget#rightWidget QLineEdit#authCodeEdit:!read-only
+{
+	border:1px solid #FF8D6B;
+}
+QWidget#rightWidget QPushButton#authCodeSeeBtn
+{
+	image: url(:/assets/images/eye-on.png);
+}
+QWidget#rightWidget QPushButton#authCodeSeeBtn:checked
+{
+	image: url(:/assets/images/eye-off.png);
+}
+
+QWidget#rightWidget QPushButton#authCodeModifyBtn
+{
+	image:url(:/assets/images/modify.png)
+}
+
+QWidget#rightWidget QPushButton#localUDIDCopyBtn:hover
+{
+	image: url(:/assets/images/copy-hover.png);
+}
+QWidget#rightWidget QPushButton#authCodeSeeBtn:hover
+{
+	image: url(:/assets/images/eye-on-hover.png);
+}
+QWidget#rightWidget QPushButton#authCodeSeeBtn:checked:hover
+{
+	image: url(:/assets/images/eye-off-hover.png);
+}
+QWidget#rightWidget QPushButton#authCodeModifyBtn:hover
+{
+	image:url(:/assets/images/modify-hover.png)
+}
+
+/*titleBar*/
+QPushButton#closeBtn,QPushButton#minBtn,QPushButton#moreBtn
+{
+	width:48px;
+	height:32px;
+	border-radius:0;
+}
+
+QPushButton#closeBtn
+{
+	image: url(:/assets/images/close.png);
+}
+QPushButton#closeBtn:hover
+{
+	image: url(:/assets/images/close-hover.png);
+	
+	background-color: #FF0000;
+}
+
+QPushButton#minBtn
+{
+	image: url(:/assets/images/min.png);
+}
+
+QPushButton#moreBtn
+{
+	image: url(:/assets/images/more.png);
+}
+
+QPushButton#minBtn:hover,QPushButton#moreBtn:hover
+{
+	background-color: rgb(245, 245, 245);
+}
+</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="leftMenuWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="titleLab">
+        <property name="text">
+         <string>顿开远程控制</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="SClickWidget" name="userInfoWidget" native="true">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="profileLab">
+           <property name="minimumSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>48</width>
+             <height>48</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="assets.qrc">:/assets/images/account.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="loginLab">
+           <property name="font">
+            <font>
+             <pointsize>13</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>登录/注册</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="remoteBtn">
+        <property name="text">
+         <string>远程协助</string>
+        </property>
+        <property name="icon">
+         <iconset resource="assets.qrc">
+          <normaloff>:/assets/images/remote.png</normaloff>
+          <normalon>:/assets/images/remote-chk.png</normalon>
+          <selectedon>:/assets/images/remote-chk.png</selectedon>:/assets/images/remote.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="deviceBtn">
+        <property name="text">
+         <string>设备列表</string>
+        </property>
+        <property name="icon">
+         <iconset resource="assets.qrc">
+          <normaloff>:/assets/images/device.png</normaloff>
+          <normalon>:/assets/images/device-chk.png</normalon>:/assets/images/device.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="statusLab">
+        <property name="text">
+         <string>服务器连接中断</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="rightWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QWidget" name="titleBar" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>32</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="moreBtn">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="minBtn">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="closeBtn">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="stackedWidget">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="loginRegisterPage">
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QStackedWidget" name="logRegisterStackedWidget">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="loginPage">
+             <widget class="QLabel" name="label">
+              <property name="geometry">
+               <rect>
+                <x>210</x>
+                <y>100</y>
+                <width>131</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>账号登录</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+             <widget class="QLineEdit" name="lineEdit">
+              <property name="geometry">
+               <rect>
+                <x>170</x>
+                <y>200</y>
+                <width>271</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="placeholderText">
+               <string>账号</string>
+              </property>
+             </widget>
+             <widget class="QLineEdit" name="lineEdit_2">
+              <property name="geometry">
+               <rect>
+                <x>170</x>
+                <y>250</y>
+                <width>271</width>
+                <height>31</height>
+               </rect>
+              </property>
+              <property name="placeholderText">
+               <string>密码</string>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton">
+              <property name="geometry">
+               <rect>
+                <x>270</x>
+                <y>350</y>
+                <width>75</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>登录</string>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="geometry">
+               <rect>
+                <x>270</x>
+                <y>390</y>
+                <width>75</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>注册</string>
+              </property>
+             </widget>
+             <widget class="QCheckBox" name="checkBox">
+              <property name="geometry">
+               <rect>
+                <x>180</x>
+                <y>300</y>
+                <width>80</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>自动登录</string>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_3">
+              <property name="geometry">
+               <rect>
+                <x>370</x>
+                <y>290</y>
+                <width>75</width>
+                <height>24</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>忘记密码</string>
+              </property>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="registerPage"/>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="remotePage">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="leftMargin">
+           <number>40</number>
+          </property>
+          <property name="rightMargin">
+           <number>40</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="widget_2" native="true">
+            <layout class="QGridLayout" name="gridLayout">
+             <property name="verticalSpacing">
+              <number>10</number>
+             </property>
+             <item row="3" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="Line" name="splitLine">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item row="3" column="2">
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <property name="spacing">
+                <number>10</number>
+               </property>
+               <item>
+                <widget class="QLineEdit" name="authCodeEdit">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>1</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>90</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>--- --- ---</string>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="authCodeSeeBtn">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="authCodeModifyBtn">
+                 <property name="minimumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="3" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QLineEdit" name="localUDIDEdit">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>--- --- ---</string>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="localUDIDCopyBtn">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="localUDIDLab">
+               <property name="text">
+                <string>本机识别码</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="allowLab">
+               <property name="text">
+                <string>允许控制本设备</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLabel" name="authCodeLab">
+               <property name="text">
+                <string>验证码</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>44</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="0" column="0">
+              <spacer name="verticalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_3" native="true">
+            <layout class="QGridLayout" name="gridLayout_2">
+             <property name="leftMargin">
+              <number>9</number>
+             </property>
+             <property name="horizontalSpacing">
+              <number>10</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>20</number>
+             </property>
+             <item row="1" column="0">
+              <widget class="QLineEdit" name="buddyUDIDEdit">
+               <property name="minimumSize">
+                <size>
+                 <width>324</width>
+                 <height>40</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>324</width>
+                 <height>40</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="placeholderText">
+                <string>请输入小伙伴识别码</string>
+               </property>
+               <property name="clearButtonEnabled">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="buddyConnectBtn">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>40</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>40</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>连接</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="controlDeviceLab">
+               <property name="text">
+                <string>远程控制设备</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="deviceListPage"/>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SClickWidget</class>
+   <extends>QWidget</extends>
+   <header>common/SClickWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
+ <connections/>
+</ui>
