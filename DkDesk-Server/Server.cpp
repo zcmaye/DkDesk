@@ -58,9 +58,10 @@ void  Server::onNewConnection()
 
 void  Server::onClientReadReady()
 {
+	int i = 0;
 	for (auto w : _wraps)
 	{
-		qInfo() << w->udid;
+		qInfo() << "udids[" << i++ << "]" << w->udid;
 	}
 
 	auto sock = dynamic_cast<QTcpSocket*>(sender());
@@ -98,7 +99,7 @@ void  Server::onClientReadReady()
 			break;
 		case MsgType::Request_Connect:
 		{
-			qInfo() << "------beg------";
+			qInfo() << "beg Request_Connect" << jd.toJson().data();
 			//查找要连接的伙伴是否存在
 			auto it = std::find_if(_wraps.begin(), _wraps.end(), [&](Wrap* w)
 				{
@@ -107,11 +108,8 @@ void  Server::onClientReadReady()
 			if (it != _wraps.end())
 			{
 				jd.addValue("state", MsgState::Ok);
-				//拿到伙伴的IP地址和端口号
-				//jd.addValue("address", (*it)->sock->peerAddress().toString().toStdString());
-				//jd.addValue("port", (*it)->sock->peerPort());
-				//qInfo() <<  (*it)->sock->peerAddress() << (*it)->sock->localAddress();
-				//qInfo() <<    (*it)->sock->peerPort()<<(*it)->sock->localPort();
+				//拿到伙伴的IP地址,端口号已经由客户端传递过来了
+				jd.addValue("address", sock->peerAddress().toString().toStdString());
 
 				//询问伙伴是否接受连接
 				(*it)->sock->write(jd.toJson().data());
@@ -121,13 +119,12 @@ void  Server::onClientReadReady()
 				jd.addValue("state", MsgState::NotFound);
 				sock->write(jd.toJson().data());
 			}
-			qInfo() << "------end------";
+			qInfo() << "end Request_Connect"<<jd.toJson().data();
 			break;
 		}
 		case MsgType::Ready_Connect:
 		{
-			qInfo() << "client peer address" << sock->peerAddress() << "client port" << sock->peerPort();
-			qInfo() << "client jd address" << jd.stringValue("address").data() << "client port" << jd.numberValue("port");
+			qInfo() << "beg Ready_Connect" << jd.toJson().data();
 			auto it = std::find_if(_wraps.begin(), _wraps.end(), [&](Wrap* w)
 				{
 					return w->udid == (qint32)jd.numberValue("fromUdid");
@@ -135,18 +132,15 @@ void  Server::onClientReadReady()
 			if (it != _wraps.end())
 			{
 				jd.addValue("address", sock->peerAddress().toString().toStdString());	//获取客户端的公网ip地址
-				jd.addValue("port", jd.numberValue("port"));	//拿到客户端发过来的端口号，转发给请求连接的客户端
+				//jd.addValue("port", jd.numberValue("port"));	//拿到客户端发过来的端口号，转发给请求连接的客户端
 				(*it)->sock->write(jd.toJson().data());
 			}
-			
+			qInfo() << "end Ready_Connect" << jd.toJson().data();
 		}
 			break;
 		default:
 			break;
 		}
-
-		qInfo() << __FUNCSIG__<<byte;
-
 	}
 	
 }

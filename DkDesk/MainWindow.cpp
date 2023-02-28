@@ -16,6 +16,8 @@
 #include <QHostInfo>
 #include <QNetworkInformation>
 #include <QNetworkInterface>
+#include <QUdpSocket>
+#include <QNetworkDatagram>
 
 MainWindow::MainWindow(QWidget* parent)
 	:QWidget(parent)
@@ -23,7 +25,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
 	ui->setupUi(this);
 	this->init();
-
+	initUdpSocket();
 	//quint32 ip4addr;
 	//auto addr_list =  QNetworkInterface::allAddresses();
 	//for (auto addr : addr_list)
@@ -57,7 +59,11 @@ void MainWindow::init()
 	//titleBar
 	connect(ui->closeBtn, &QPushButton::released, this, &MainWindow::close);
 	connect(ui->minBtn, &QPushButton::released, this, &MainWindow::showMinimized);
-	connect(ui->moreBtn, &QPushButton::released, this, &MainWindow::close);
+	connect(ui->moreBtn, &QPushButton::released, this, [=]()
+		{
+			auto len =_udpSocket->writeDatagram("Hello!,hahaha!", QHostAddress(_address), _port);
+			qInfo() << "send succeed:"<< len << _address<<"    "<<ui->localUDIDEdit->text();
+		});
 	//leftMenuWidget
 	connect(ui->userInfoWidget, &SClickWidget::released, this, [=]
 		{
@@ -127,7 +133,9 @@ void MainWindow::init()
 			jd.addValue("type", MsgType::Request_Connect);
 			jd.addValue("toUdid", ui->buddyUDIDEdit->text().toInt());
 			jd.addValue("fromUdid", ui->localUDIDEdit->text().toInt());
+			jd.addValue("port", _udpSocket->localPort());
 			SNetworkConnect::mainCon()->write(jd.toJson().data());
+			qInfo() << _udpSocket->localPort();
 		});
 
 
@@ -136,6 +144,37 @@ void MainWindow::init()
 	connect(sock, &SNetworkConnect::connectSucceed, this, &MainWindow::onConnectSucceed);
 	connect(sock, &SNetworkConnect::connectFailed, this, &MainWindow::onConnectFailed);
 	connect(sock, &SNetworkConnect::readReady, this, &MainWindow::onReadReady);
+}
+
+void MainWindow::initUdpSocket()
+{
+	_udpSocket = new QUdpSocket(this);
+
+	connect(_udpSocket, &QUdpSocket::errorOccurred, [=]()
+		{
+			qWarning() << "UDP errorOccurred" << _udpSocket->errorString();
+		});
+	connect(_udpSocket, &QUdpSocket::readyRead,
+		this, [=]()
+		{
+			while (_udpSocket->hasPendingDatagrams())
+			{
+				auto datagram = _udpSocket->receiveDatagram();
+				qInfo() << "has datagram " << datagram.data()<<datagram.senderAddress()<<datagram.senderPort();
+				_port = datagram.senderPort();
+			}
+			
+		});
+
+	if (!_udpSocket->bind(QHostAddress::AnyIPv4))
+	{
+		qWarning() << "UDP bind failed" << _udpSocket->errorString();
+	}
+	else
+	{
+		qWarning() << "UDP bind succeed"<< _udpSocket->localAddress()<<_udpSocket->localPort();
+	}
+
 }
 
 void MainWindow::onConnectSucceed()
@@ -189,16 +228,24 @@ void  MainWindow::onReadReady()
 		//同意连接
 		if (1)
 		{		
-			//开始监听
-			QTcpServer* server = new QTcpServer(this);
-			if (!server->listen(QHostAddress::AnyIPv4))
-			{
-				qInfo() << "listen failed" << server->errorString();
+			//开始监听TCP
+			/*{
+				QTcpServer* server = new QTcpServer(this);
+				if (!server->listen(QHostAddress::AnyIPv4))
+				{
+					qInfo() << "listen failed" << server->errorString();
+				}
+				else
+				{
+					qInfo() << "listen succeed" << server->serverAddress() << server->serverPort() << server->serverError();
+					connect(server, &QTcpServer::newConnection, this, []()
+						{
+							qInfo() << "和伙伴连接成功~~";
+						});
+				}
 			}
-			else
-			{
-				qInfo() << "listen succeed" << server->serverAddress() << server->serverPort() << server->serverError();
-			}
+			*/
+
 			//{
 			//	
 			//	auto addr_list = QNetworkInterface::allAddresses();
@@ -215,15 +262,21 @@ void  MainWindow::onReadReady()
 			//
 			//}
 			
-			connect(server, &QTcpServer::newConnection, this, []()
-				{
-					qInfo() << "和伙伴连接成功~~";
-				});
-			jd.addValue("address", server->serverAddress().toString().toStdString());
-			jd.addValue("port", server->serverPort());
+			{
+				//读取对方的IP地址和端口号
+				auto address = jd.stringValue("address");
+				quint16 port = jd.numberValue("port");
+				//写入自己端口号
+				//jd.addValue("address", _udpSocket->());
+				jd.addValue("port", _udpSocket->localPort());
+				qInfo() <<"self port" << _udpSocket->localPort();
+				_udpSocket->writeDatagram("Hello!,I Consent connection!", QHostAddress(address.data()), port);
+				qInfo() << "Request_Connect list start" << address.data() << port;
+				_address = address.data();
+			}
+
 			jd.addValue("type", MsgType::Ready_Connect);
 			SNetworkConnect::mainCon()->write(jd.toJson().data());
-			qInfo() << "Request_Connect---end---";
 		}
 		//拒绝连接
 		else
@@ -236,11 +289,8 @@ void  MainWindow::onReadReady()
 	case MsgType::Ready_Connect:
 	{
 		qInfo() << "Ready_Connect";
-		//拿到伙伴的IP地址和端口号
-		auto address = jd.stringValue("address");
-		auto port = jd.numberValue("port");
 
-		QTcpSocket* newSock = new QTcpSocket(this);
+		/*QTcpSocket* newSock = new QTcpSocket(this);
 
 		connect(newSock, &QTcpSocket::connected, [=]()
 			{
@@ -251,6 +301,16 @@ void  MainWindow::onReadReady()
 				qInfo() << "连接到伙伴非常的失败了哦！"<<newSock->errorString();
 			});
 		newSock->connectToHost(address.data(), port);
+		*/
+		//开始监听UDP
+		{
+			//拿到伙伴的IP地址和端口号
+			auto address = jd.stringValue("address");
+			auto port = jd.numberValue("port");
+			_udpSocket->writeDatagram("Hello!you Consent connection,I'm very happy!", QHostAddress(address.data()), port);
+			qInfo() << "Ready_Connect list start" << address.data() << port;
+			_address = address.data();
+		}
 		break;
 	}
 	case MsgType::ConnectBuddy:
