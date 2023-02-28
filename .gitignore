@@ -33,3 +33,5 @@
 
 # dir
 out/
+.vs/
+bin/
