@@ -26,18 +26,9 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->setupUi(this);
 	this->init();
 	initUdpSocket();
-	//quint32 ip4addr;
-	//auto addr_list =  QNetworkInterface::allAddresses();
-	//for (auto addr : addr_list)
-	//{
-	//	bool ok = false;
-	//	ip4addr = addr.toIPv4Address(&ok)<<ok;
-	//	if (ok)
-	//	{
-	//		break;
-	//	}
-	//}
-	
+
+	getLocalAddress();
+
 }
 
 MainWindow::~MainWindow()
@@ -61,14 +52,14 @@ void MainWindow::init()
 	connect(ui->minBtn, &QPushButton::released, this, &MainWindow::showMinimized);
 	connect(ui->moreBtn, &QPushButton::released, this, [=]()
 		{
-			auto len =_udpSocket->writeDatagram("Hello!,hahaha!", QHostAddress(_address), _port);
-			qInfo() << "send succeed:"<< len << _address<<"    "<<ui->localUDIDEdit->text();
+			auto len = _udpSocket->writeDatagram("Hello!,hahaha!", QHostAddress(_address), _port);
+	qInfo() << "send succeed:" << len << _address << "    " << ui->localUDIDEdit->text();
 		});
 	//leftMenuWidget
 	connect(ui->userInfoWidget, &SClickWidget::released, this, [=]
 		{
 			ui->deviceBtn->setChecked(true);
-			ui->stackedWidget->setCurrentIndex(0);
+	ui->stackedWidget->setCurrentIndex(0);
 		});
 	connect(ui->remoteBtn, &QPushButton::released, this, [=] {ui->stackedWidget->setCurrentIndex(1); });
 	connect(ui->deviceBtn, &QPushButton::released, this, [=] {ui->stackedWidget->setCurrentIndex(2); });
@@ -77,9 +68,9 @@ void MainWindow::init()
 	connect(ui->localUDIDCopyBtn, &QPushButton::released, this, [=]()
 		{
 			auto clipBoard = qApp->clipboard();
-			QString str = "我的识别码：" + ui->localUDIDEdit->text() + "\n";
-			str += "使用顿开教育远程控制即可对我发起远程协助~\n顽石老师";
-			clipBoard->setText(str);
+	QString str = "我的识别码：" + ui->localUDIDEdit->text() + "\n";
+	str += "使用顿开教育远程控制即可对我发起远程协助~\n顽石老师";
+	clipBoard->setText(str);
 		});
 	//--查看验证码
 	connect(ui->authCodeSeeBtn, &QPushButton::toggled, this, [=](bool chk)
@@ -106,9 +97,9 @@ void MainWindow::init()
 			{
 				//ui->authCodeEdit->clearFocus();
 				ui->authCodeEdit->setReadOnly(true);
-				
+
 			}
-			
+
 
 		});
 	//--验证码框丢失焦点
@@ -129,13 +120,15 @@ void MainWindow::init()
 				qInfo() << "请输入正确的识别码";
 				return;
 			}
-			SJsonData jd;
-			jd.addValue("type", MsgType::Request_Connect);
-			jd.addValue("toUdid", ui->buddyUDIDEdit->text().toInt());
-			jd.addValue("fromUdid", ui->localUDIDEdit->text().toInt());
-			jd.addValue("port", _udpSocket->localPort());
-			SNetworkConnect::mainCon()->write(jd.toJson().data());
-			qInfo() << _udpSocket->localPort();
+	SJsonData jd;
+	jd.addValue("type", MsgType::Request_Connect);
+	jd.addValue("toUdid", ui->buddyUDIDEdit->text().toInt());
+	jd.addValue("fromUdid", ui->localUDIDEdit->text().toInt());
+	jd.addValue("localAddress", getLocalAddress().toString().toStdString());
+	jd.addValue("localPort", _udpSocket->localPort());
+
+	SNetworkConnect::mainCon()->write(jd.toJson().data());
+	qInfo() << _udpSocket->localPort();
 		});
 
 
@@ -157,13 +150,40 @@ void MainWindow::initUdpSocket()
 	connect(_udpSocket, &QUdpSocket::readyRead,
 		this, [=]()
 		{
+			
 			while (_udpSocket->hasPendingDatagrams())
 			{
-				auto datagram = _udpSocket->receiveDatagram();
-				qInfo() << "has datagram " << datagram.data()<<datagram.senderAddress()<<datagram.senderPort();
-				_port = datagram.senderPort();
+				auto datagram = _udpSocket->receiveDatagram();		
+
+				qInfo() << "has datagram " << datagram.data() << datagram.senderAddress() << datagram.senderPort();
+				
+				SJsonData jd = SJsonData::fromString(datagram.data());
+				switch ((qint32)jd.numberValue("type"))
+				{
+				case MsgType::Request_Connect:
+					_port = datagram.senderPort();
+					_address = datagram.senderAddress().toString();
+
+					jd.addValue("type", MsgType::Ready_Connect);
+					jd.addValue("message","OK!I got your message!");
+					_udpSocket->writeDatagram(jd.toJson().data(), QHostAddress(_address), _port);
+					break;
+				case MsgType::Ready_Connect:
+					_port = datagram.senderPort();
+					_address = datagram.senderAddress().toString();
+
+					jd.addValue("type", MsgType::Succeed_Connect);
+					jd.addValue("message", "OK!I got your message,succeed connect!");
+					_udpSocket->writeDatagram(jd.toJson().data(), QHostAddress(_address), _port);
+					break;
+				case MsgType::Succeed_Connect:
+					_udpSocket->writeDatagram("begin remote 远程控制吧！！", QHostAddress(_address), _port);
+					break;
+				default:
+					break;
+				}
 			}
-			
+
 		});
 
 	if (!_udpSocket->bind(QHostAddress::AnyIPv4))
@@ -172,9 +192,23 @@ void MainWindow::initUdpSocket()
 	}
 	else
 	{
-		qWarning() << "UDP bind succeed"<< _udpSocket->localAddress()<<_udpSocket->localPort();
+		qWarning() << "UDP bind succeed" << _udpSocket->localAddress() << _udpSocket->localPort();
 	}
 
+}
+
+QHostAddress MainWindow::getLocalAddress() const
+{
+	auto addr_list = QNetworkInterface::allAddresses();
+	for (auto addr : addr_list)
+	{
+		if (!addr.isLoopback() && addr.protocol() == QHostAddress::NetworkLayerProtocol::IPv4Protocol)
+		{
+			return addr;
+			//qInfo() << addr<<addr.protocol();
+		}
+	}
+	return QHostAddress();
 }
 
 void MainWindow::onConnectSucceed()
@@ -213,7 +247,7 @@ void  MainWindow::onReadReady()
 			ui->localUDIDEdit->setText(QString::number(jd.intValue("udid")));
 			ui->authCodeEdit->setText("Sd67S");
 
-			QSettings settings("DkDesk.ini",QSettings::Format::IniFormat);
+			QSettings settings("DkDesk.ini", QSettings::Format::IniFormat);
 			settings.setValue("udid", jd.intValue("udid"));
 			settings.setValue("authCode", ui->authCodeEdit->text());
 		}
@@ -227,7 +261,7 @@ void  MainWindow::onReadReady()
 		qInfo() << "Request_Connect";
 		//同意连接
 		if (1)
-		{		
+		{
 			//开始监听TCP
 			/*{
 				QTcpServer* server = new QTcpServer(this);
@@ -261,21 +295,30 @@ void  MainWindow::onReadReady()
 			//	}
 			//
 			//}
-			
+
 			{
 				//读取对方的IP地址和端口号
+				//对方本地的
+				auto laddress = jd.stringValue("localAddress");
+				quint16 lport = jd.numberValue("localPort");
+				//服务器查看到的对方的
 				auto address = jd.stringValue("address");
 				quint16 port = jd.numberValue("port");
-				//写入自己端口号
-				//jd.addValue("address", _udpSocket->());
-				jd.addValue("port", _udpSocket->localPort());
-				qInfo() <<"self port" << _udpSocket->localPort();
-				_udpSocket->writeDatagram("Hello!,I Consent connection!", QHostAddress(address.data()), port);
+
+				//写入自己端口号和IP地址
+				jd.addValue("localAddress", _udpSocket->localAddress().toString().toStdString());
+				jd.addValue("localPort", _udpSocket->localPort());
+
+				_udpSocket->writeDatagram("global Hello!,I Consent connection!", QHostAddress(address.data()), port);
+				_udpSocket->writeDatagram("local Hello!,I Consent connection!", QHostAddress(laddress.data()), lport);
+
 				qInfo() << "Request_Connect list start" << address.data() << port;
-				_address = address.data();
 			}
 
 			jd.addValue("type", MsgType::Ready_Connect);
+			jd.addValue("localAddress", getLocalAddress().toString().toStdString());
+			jd.addValue("localPort", _udpSocket->localPort());
+
 			SNetworkConnect::mainCon()->write(jd.toJson().data());
 		}
 		//拒绝连接
@@ -290,27 +333,27 @@ void  MainWindow::onReadReady()
 	{
 		qInfo() << "Ready_Connect";
 
-		/*QTcpSocket* newSock = new QTcpSocket(this);
-
-		connect(newSock, &QTcpSocket::connected, [=]()
-			{
-				qInfo() << "连接到伙伴非常的成功哦！"<<newSock->peerAddress();
-			});
-		connect(newSock, &QTcpSocket::errorOccurred, [=]()
-			{
-				qInfo() << "连接到伙伴非常的失败了哦！"<<newSock->errorString();
-			});
-		newSock->connectToHost(address.data(), port);
-		*/
-		//开始监听UDP
+		SJsonData udpJsData;
+		udpJsData.addValue("type", MsgType::Request_Connect);
+		
+		//两台主机不在同一局域网
 		{
 			//拿到伙伴的IP地址和端口号
 			auto address = jd.stringValue("address");
 			auto port = jd.numberValue("port");
-			_udpSocket->writeDatagram("Hello!you Consent connection,I'm very happy!", QHostAddress(address.data()), port);
-			qInfo() << "Ready_Connect list start" << address.data() << port;
-			_address = address.data();
+			udpJsData.addValue("message", "global Hello!you Consent connection, I'm very happy!");
+			_udpSocket->writeDatagram(udpJsData.toJson().data(), QHostAddress(address.data()), port);
 		}
+		//两台主机在同一局域网
+		{
+
+			auto laddress = jd.stringValue("localAddress");
+			quint16 lport = jd.numberValue("localPort");
+			udpJsData.addValue("message", "local Hello!you Consent connection, I'm very happy!");
+			_udpSocket->writeDatagram(udpJsData.toJson().data(), QHostAddress(laddress.data()), lport);
+
+		}
+		qInfo() << "Ready_Connect list start";
 		break;
 	}
 	case MsgType::ConnectBuddy:
@@ -318,7 +361,7 @@ void  MainWindow::onReadReady()
 		auto state = jd.intValue("state");
 		if (state == MsgState::Ok)
 		{
-			
+
 			auto address = jd.stringValue("address");
 			auto port = (quint16)jd.numberValue("port");
 			qInfo() << "准备连接" << address.data() << port;
@@ -331,11 +374,11 @@ void  MainWindow::onReadReady()
 		}
 
 	}
-		break;
+	break;
 	default:
 		break;
 	}
 
 
 }
-/*https://evilpan.com/2015/10/31/p2p-over-middle-box/*/
+//https://evilpan.com/2015/10/31/p2p-over-middle-box/

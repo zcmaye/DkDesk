@@ -58,11 +58,6 @@ void  Server::onNewConnection()
 
 void  Server::onClientReadReady()
 {
-	int i = 0;
-	for (auto w : _wraps)
-	{
-		qInfo() << "udids[" << i++ << "]" << w->udid;
-	}
 
 	auto sock = dynamic_cast<QTcpSocket*>(sender());
 	if (sock)
@@ -108,8 +103,11 @@ void  Server::onClientReadReady()
 			if (it != _wraps.end())
 			{
 				jd.addValue("state", MsgState::Ok);
-				//拿到伙伴的IP地址,端口号已经由客户端传递过来了
+				//拿到请求连接的客户端的Ip地址,端口号已经由客户端传递过来了
 				jd.addValue("address", sock->peerAddress().toString().toStdString());
+				jd.addValue("port",jd.numberValue("localPort"));	//两个端口号一样
+				qInfo() << "address" << jd.stringValue("address").data();
+				//jd.addValue("port", sock->peerPort());
 
 				//询问伙伴是否接受连接
 				(*it)->sock->write(jd.toJson().data());
@@ -132,7 +130,7 @@ void  Server::onClientReadReady()
 			if (it != _wraps.end())
 			{
 				jd.addValue("address", sock->peerAddress().toString().toStdString());	//获取客户端的公网ip地址
-				//jd.addValue("port", jd.numberValue("port"));	//拿到客户端发过来的端口号，转发给请求连接的客户端
+				jd.addValue("port", jd.numberValue("localPort"));	//两个端口号一样	//拿到客户端发过来的端口号，转发给请求连接的客户端
 				(*it)->sock->write(jd.toJson().data());
 			}
 			qInfo() << "end Ready_Connect" << jd.toJson().data();
@@ -142,7 +140,13 @@ void  Server::onClientReadReady()
 			break;
 		}
 	}
-	
+
+	int i = 0;
+	for (auto w : _wraps)
+	{
+		qInfo() << "udids[" << i++ << "]" << w->udid;
+	}
+
 }
 
 void Server::onClientDisConnected()

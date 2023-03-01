@@ -30,6 +30,7 @@ enum  MsgType : int32_t
 
 		//客户端->服务器->客户端
 		Ready_Connect,		//如果伙伴同意连接，发送给服务器，服务器转发给客户端
+		Succeed_Connect
 };
 
 

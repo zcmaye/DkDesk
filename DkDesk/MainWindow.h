@@ -11,6 +11,7 @@ public:
 	~MainWindow();
 	void init();
 	void initUdpSocket();
+	QHostAddress getLocalAddress()const;
 public:
 	void onConnectSucceed();
 	void onConnectFailed();
